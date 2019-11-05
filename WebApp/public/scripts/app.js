@@ -10,7 +10,7 @@ window.document.oncontextmenu = function () {
   return false;     // cancel default menu
 }
 
-window.addEventListener('resize', function() {
+window.addEventListener('resize', function () {
   videoPlayer.resizeVideo();
 }, true);
 
@@ -37,14 +37,21 @@ function onClickPlayButton() {
   elementVideo.id = 'Video';
   elementVideo.style.touchAction = 'none';
   playerDiv.appendChild(elementVideo);
-  setupVideoPlayer(elementVideo).then(value => videoPlayer = value);
+
+  fetch("/turn/")
+    .then(function (response) {
+      return response.json();
+    })
+    .then((rtcConfig) => {
+      setupVideoPlayer(elementVideo, rtcConfig).then(value => videoPlayer = value);
+    });
 
   // add green button
   const elementBlueButton = document.createElement('button');
   elementBlueButton.id = "blueButton";
   elementBlueButton.innerHTML = "Light on";
   playerDiv.appendChild(elementBlueButton);
-  elementBlueButton.addEventListener ("click", function() {
+  elementBlueButton.addEventListener("click", function () {
     sendClickEvent(videoPlayer, 1);
   });
 
@@ -53,7 +60,7 @@ function onClickPlayButton() {
   elementGreenButton.id = "greenButton";
   elementGreenButton.innerHTML = "Light off";
   playerDiv.appendChild(elementGreenButton);
-  elementGreenButton.addEventListener ("click", function() {
+  elementGreenButton.addEventListener("click", function () {
     sendClickEvent(videoPlayer, 2);
   });
 
@@ -62,7 +69,7 @@ function onClickPlayButton() {
   elementOrangeButton.id = "orangeButton";
   elementOrangeButton.innerHTML = "Play audio";
   playerDiv.appendChild(elementOrangeButton);
-  elementOrangeButton.addEventListener ("click", function() {
+  elementOrangeButton.addEventListener("click", function () {
     sendClickEvent(videoPlayer, 3);
   });
 
@@ -71,12 +78,12 @@ function onClickPlayButton() {
   elementFullscreenButton.id = 'fullscreenButton';
   elementFullscreenButton.src = 'images/FullScreen.png';
   playerDiv.appendChild(elementFullscreenButton);
-  elementFullscreenButton.addEventListener ("click", function() {
+  elementFullscreenButton.addEventListener("click", function () {
     if (!document.fullscreenElement) {
-      if(document.documentElement.requestFullscreen) {
+      if (document.documentElement.requestFullscreen) {
         document.documentElement.requestFullscreen();
       }
-      else if(document.documentElement.webkitRequestFullscreen){
+      else if (document.documentElement.webkitRequestFullscreen) {
         document.documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
       }
     }
@@ -85,7 +92,7 @@ function onClickPlayButton() {
   document.addEventListener('fullscreenchange', onFullscreenChange);
 
   function onFullscreenChange(e) {
-    if(document.webkitFullscreenElement || document.fullscreenElement) {
+    if (document.webkitFullscreenElement || document.fullscreenElement) {
       elementFullscreenButton.style.display = 'none';
     }
     else {
